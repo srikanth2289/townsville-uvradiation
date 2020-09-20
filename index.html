@@ -93,7 +93,6 @@
 	     				}
 	     				counter = counter+1;
 	     				if(counter === resource.length) {
-	     					console.log(uvIndex);
 	     					var averageUV = uvIndex.reduce((total, uvindex) => total + uvindex) / uvIndex.length;
 	     					//averageUV = averageUV.toFixed(2);
 	     					$('#result').append("<tr><td><strong>Total Average</strong></td><td><span>"+averageUV+"</span></td></tr>");
