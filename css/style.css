@@ -1,0 +1,64 @@
+html,body {
+	font-family: 'Roboto', sans-serif;
+	 height: 100%;
+	 margin: 0;
+	 padding: 10px 0;
+}
+.container {
+	width: 1024px;
+	margin: 0 auto;
+}
+header {
+	background: blue;
+	display: block;
+	padding: 20px;
+	text-align: center;
+	font-weight: bold;
+	font-size: 30px;
+}
+.body 
+{
+	padding: 20px;
+	display: block;
+	text-align: center;
+	border: solid 2px #007bff;
+	height: 100%;
+	min-height: 500px;
+}
+h2{
+	text-transform: uppercase;
+}
+.button {
+	background-color: #007bff;
+	padding: 13px 20px;
+	border-radius: 5px;
+	color: #fff;
+	text-decoration: none;
+	font-weight: bold;
+	border:none;
+	cursor: pointer;
+}
+.button:disabled{
+	opacity: 0.5;
+	cursor: default;
+}
+.flatpickr {
+	padding: 10px;
+	border-radius: 5px;
+}
+#result {
+	margin: 0;
+	padding: 0;
+	width: 500px;
+    margin: 30px auto 0 auto;
+}
+#result td, #result th {
+	border:solid 1px #007bff;
+	padding: 10px;
+}
+#result span {
+	color:  red;
+}
+#loading {
+	padding: 20px 0;
+}

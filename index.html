@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>UV</title>
+		<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="css/style.css">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  		<script src="https://code.jquery.com/jquery-3.5.1.min.js"crossorigin="anonymous"></script>
+  		<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+	</head>
+	<body>
+		<div class="container">
+			<header>UV INDEX FORECAST IN TOWNSVILLE</header>
+			<section class="body">
+				<h2>UV Index forecase 2021</h2>
+				<h3>Location: Townsville</h3>
+				<strong>Data and Time:</strong> <input class="flatpickr flatpickr-input active" type="text" placeholder="Select Date.." id="datetime" data-id="datetime" readonly="readonly">
+				<button class="button" href="javascript:void(0)" onClick="getUV()">Check UV</button>
+				<table id="result" style="display: none">
+				</table>
+				<div id="loading" style="display: none">Loading...</div>
+			</section>	
+		</div>
+		<script>
+			var button = document.querySelector('button')
+			flatpickr("#datetime", {
+				enableTime: true,
+	    		dateFormat: "Y-m-d H:i:S",
+	    		minDate: "2021-01",
+	    		maxDate: "2021-12"
+			});
+
+			var currentYear = 2010;
+  			var resource = ['ce0eb1ee-6488-4960-a839-c04d25d8ab29','b8549d57-e227-4b11-88b5-2fe14e27ad11', '87bc231d-0e20-4e87-bd3b-f3059a87937b', '4b86c05d-b797-4a67-8f2c-531088906bb1', 'fbde7a39-b490-499d-845f-9092462a2854', 'b8602f24-a78d-40b2-be35-c280243713cf', 'aae59900-fda3-4cc2-9046-b6845ad893d7', 'b03444b5-c97f-4bfa-8b09-beeb941d73cc', 'c05290c2-2c04-4341-8d85-6237652ba1fd', '6f58e006-c647-415d-ae91-84cff605e340'];
+
+  			var counter = 0;
+  			var uvIndex = [];
+
+  			function getUV(){
+  				button.disabled = true;
+  				counter = 0;
+  				currentYear = 2010;
+  				uvIndex = [];
+  				$('#result').css('display', 'none');
+  				$('#loading').css('display', 'none');
+  				document.getElementById('result').innerHTML = "";
+  				var dateTime = document.getElementById('datetime').value;
+  				if(dateTime === ''){
+  					alert('Please select date and time');
+  					button.disabled = false;
+  					return false;
+  				}else{
+  					getDataByDateTime(dateTime);  	
+  					$('#loading').css('display', 'block');				
+  					$('#result').append("<tr><th>Date & Time</th><th>UV Index</th></tr>");
+  				}
+  				return true;
+  			}
+
+
+  			function getDataByDateTime(date_time) {
+  				var dateTime = date_time.split(" ");
+  				var date = dateTime[0];
+  				var time = dateTime[1];
+  				var dateArr = dateTime[0].split("-");
+  				for(var i=0; i<resource.length;i++){
+  					var yearStr = currentYear.toString();
+  					var currentDate = yearStr+'-'+dateArr[1]+"-"+dateArr[2]+' '+time;
+  					callApi(resource[i],currentDate);
+  					currentYear = currentYear + 1;
+  				}
+  			}
+
+  			function callApi(resource_id, date_time) {
+  				var data = {
+					resource_id: resource_id, 
+					limit: 1000000, 
+					q: date_time
+	  			};
+
+	  			$.ajax({
+	    			url: 'https://data.gov.au/data/api/3/action/datastore_search',
+	    			data: data,
+	    			cache: true,
+	    			dataType: 'jsonp',
+	    			success: function(data) {	    				
+	     				for(var i=0;i<data.result.records.length;i++){	     					
+	     					if((data.result.records[i].timestamp != undefined && data.result.records[i].timestamp) === date_time || (data.result.records[i]['Date-Time'] != undefined && data.result.records[i]['Date-Time']) === date_time){
+	     						uvIndex.push(parseFloat(data.result.records[i].UV_Index));
+	     						$('#result').append("<tr><td><strong>"+date_time+"</strong></td><td><span>"+data.result.records[i].UV_Index+"</span></td></tr>");
+	     					}
+	     				}
+	     				counter = counter+1;
+	     				if(counter === resource.length) {
+	     					console.log(uvIndex);
+	     					var averageUV = uvIndex.reduce((total, uvindex) => total + uvindex) / uvIndex.length;
+	     					//averageUV = averageUV.toFixed(2);
+	     					$('#result').append("<tr><td><strong>Total Average</strong></td><td><span>"+averageUV+"</span></td></tr>");
+	     					$('#loading').css('display', 'none');
+	     					$('#result').css('display', 'table');
+	     					button.disabled = false;
+	     				}
+	    			}
+	  			});
+  			}
+
+		</script>
+	</body>
+
+</html>
