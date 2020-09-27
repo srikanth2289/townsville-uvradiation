@@ -8,21 +8,143 @@
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   		<script src="https://code.jquery.com/jquery-3.5.1.min.js"crossorigin="anonymous"></script>
   		<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  		<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 	</head>
 	<body>
 		<div class="container">
 			<header>UV INDEX FORECAST IN TOWNSVILLE</header>
 			<section class="body">
-				<h2>UV Index forecase 2021</h2>
+				<h2>UV Index forecast 2021</h2>
 				<h3>Location: Townsville</h3>
 				<strong>Data and Time:</strong> <input class="flatpickr flatpickr-input active" type="text" placeholder="Select Date.." id="datetime" data-id="datetime" readonly="readonly">
 				<button class="button" href="javascript:void(0)" onClick="getUV()">Check UV</button>
-				<table id="result" style="display: none">
-				</table>
+				
 				<div id="loading" style="display: none">Loading...</div>
+				<div style="clear: both"></div>
+				<div style="width: 35%; float: left">
+					<table id="result" style="display: none; width: 100%">
+					</table>
+				</div>
+				<div style="width: 65%; float: left">
+					<div id="chart" style="width:80%; margin: 0 auto; display: none">
+					<canvas id="myChart" width="600px" height="600px"></canvas>
+				</div>
+				<div style="clear: both"></div>
 			</section>	
 		</div>
 		<script>
+			var myChart = '';
+			function drawUVGraph(uv_data,date_list) {
+				var ctx = document.getElementById('myChart');
+				Chart.defaults.global.defaultFontColor = 'black';
+				myChart = new Chart(ctx, {
+					type: 'line',
+					data: {
+						labels: date_list,
+						datasets: [{
+							label: 'UV',
+							data: uv_data,
+							backgroundColor: 'transparent',
+							borderColor: 'rgb(0,0,0)',
+							tension: 0.5,
+							borderWidth: 2,
+							fill: false,
+							label: 'UV Index',
+							pointRadius: 2
+						},
+						{
+							label: 'Normal',
+							data: [3,3,3],
+							backgroundColor: 'rgb(126, 242, 157)',
+							borderColor: 'transparent',
+							tension: 0.5,
+							borderWidth: 2,
+							fill: true,
+							label: 'Normal',
+							pointRadius: 0,
+							pointBackgroundColor: 'transparent'
+						},
+						{
+							label: 'moderate',
+							data: [6,6,6],
+							backgroundColor: 'rgb(242, 198, 136)',
+							borderColor: 'transparent',
+							tension: 0.5,
+							borderWidth: 2,
+							fill: true,
+							label: 'Moderate',
+							pointRadius: 0,
+							pointBackgroundColor: 'transparent'
+						},
+						{
+							label: 'High',
+							data: [8,8,8],
+							backgroundColor: 'rgb(245, 164, 83)',
+							borderColor: 'transparent',
+							tension: 0.5,
+							borderWidth: 2,
+							fill: true,
+							label: 'High',
+							pointRadius: 0,
+							pointBackgroundColor: 'transparent'
+						},
+						{
+							label: 'Very High',
+							data: [11,11,11],
+							backgroundColor: 'rgb(245, 89, 83)',
+							borderColor: 'transparent',
+							tension: 0.5,
+							borderWidth: 2,
+							fill: true,
+							label: 'Very High',
+							pointRadius: 0,
+							pointBackgroundColor: 'transparent'
+						},
+						{
+							label: 'Extreme',
+							data: [16,16,16],
+							backgroundColor: 'rgb(247, 59, 52)',
+							borderColor: 'transparent',
+							tension: 0.5,
+							borderWidth: 2,
+							fill: true,
+							label: 'Extreme',
+							pointRadius: 0,
+							pointBackgroundColor: 'transparent'
+						}]
+					},
+					options: {
+						title: {
+		                    display: true,
+		                    text: ''
+		                },
+						scales: {
+							xAxes: [{
+		                        scaleLabel: {
+		                            display: true,
+		                            labelString: 'Time'
+		                        },
+		                        ticks: {
+		                            beginAtZero: true
+		                        }
+		                    }],
+							yAxes: [{
+								scaleLabel: {
+		                            display: true,
+		                            labelString: 'UV Index'
+		                        },
+								gridLines: {
+		                            drawOnChartArea: false
+		                        },
+								ticks: {
+									beginAtZero: true
+								}
+							}]
+						}
+					}
+				});
+			}
+
 			var button = document.querySelector('button')
 			flatpickr("#datetime", {
 				enableTime: true,
@@ -35,15 +157,19 @@
   			var resource = ['ce0eb1ee-6488-4960-a839-c04d25d8ab29','b8549d57-e227-4b11-88b5-2fe14e27ad11', '87bc231d-0e20-4e87-bd3b-f3059a87937b', '4b86c05d-b797-4a67-8f2c-531088906bb1', 'fbde7a39-b490-499d-845f-9092462a2854', 'b8602f24-a78d-40b2-be35-c280243713cf', 'aae59900-fda3-4cc2-9046-b6845ad893d7', 'b03444b5-c97f-4bfa-8b09-beeb941d73cc', 'c05290c2-2c04-4341-8d85-6237652ba1fd', '6f58e006-c647-415d-ae91-84cff605e340'];
 
   			var counter = 0;
+  			var uvIndexByDate = [];
   			var uvIndex = [];
+  			var dateList = [];
 
   			function getUV(){
   				button.disabled = true;
   				counter = 0;
   				currentYear = 2010;
   				uvIndex = [];
+  				dateList = [];
   				$('#result').css('display', 'none');
   				$('#loading').css('display', 'none');
+  				$('#chart').css('display', 'none');
   				document.getElementById('result').innerHTML = "";
   				var dateTime = document.getElementById('datetime').value;
   				if(dateTime === ''){
@@ -88,17 +214,39 @@
 	     				for(var i=0;i<data.result.records.length;i++){	     					
 	     					if((data.result.records[i].timestamp != undefined && data.result.records[i].timestamp) === date_time || (data.result.records[i]['Date-Time'] != undefined && data.result.records[i]['Date-Time']) === date_time){
 	     						uvIndex.push(parseFloat(data.result.records[i].UV_Index));
-	     						$('#result').append("<tr><td><strong>"+date_time+"</strong></td><td><span>"+data.result.records[i].UV_Index+"</span></td></tr>");
+	     						dateList.push(date_time.split(" ")[0].split("-")[0]);
+	     						uvIndexByDate[date_time.split(" ")[0].split("-")[0]] = parseFloat(data.result.records[i].UV_Index);
+	     						//$('#result').append("<tr><td><strong>"+date_time+"</strong></td><td><span>"+data.result.records[i].UV_Index+"</span></td></tr>");
 	     					}
 	     				}
 	     				counter = counter+1;
 	     				if(counter === resource.length) {
+	     					var uvIndexArr = [];
+	     					dateList.sort();
+	     					for(var j=0;j<dateList.length;j++) {
+	     						uvIndexArr.push(uvIndexByDate[dateList[j]]);
+	     						$('#result').append("<tr><td><strong>"+dateList[j]+"</strong></td><td><span>"+uvIndexByDate[dateList[j]]+"</span></td></tr>");
+	     					}
 	     					var averageUV = uvIndex.reduce((total, uvindex) => total + uvindex) / uvIndex.length;
 	     					//averageUV = averageUV.toFixed(2);
-	     					$('#result').append("<tr><td><strong>Total Average</strong></td><td><span>"+averageUV+"</span></td></tr>");
+	     					$('#result').append("<tr><td><strong>Predicted UV Index</strong></td><td><span>"+averageUV+"</span></td></tr>");
 	     					$('#loading').css('display', 'none');
 	     					$('#result').css('display', 'table');
+	     					$('#chart').css('display', 'block');
 	     					button.disabled = false;
+	     					uvIndexArr.push(averageUV);
+	     					dateList.push('2021');
+
+	     					dateList = ["",date_time.split(" ")[1],""];
+	     					uvIndexArr = [0,averageUV,0];
+
+	     					if(myChart) {
+	     						myChart.data.labels = dateList;
+	     						myChart.data.datasets[0].data = uvIndexArr;
+	     						myChart.update()
+	     					}else{
+	     						drawUVGraph(uvIndexArr,dateList);
+	     					}
 	     				}
 	    			}
 	  			});
