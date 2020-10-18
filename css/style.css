@@ -4,7 +4,7 @@ html,body {
 	padding: 10px 0;
 }
 .container {
-	width: 1024px;
+	width: 1140px;
 	margin: 0 auto;
 }
 header {
@@ -60,4 +60,27 @@ h2{
 }
 #loading {
 	padding: 20px 0;
+}
+.menu {
+	margin: 20px 0 0 0;
+	padding: 0;
+}
+.menu li{
+	border:solid 2px #007bff;
+	margin: 0 0 10px 0;
+	padding: 0;
+	list-style: none;
+}
+.menu li a{
+	color: #000;
+	text-decoration: none;
+	padding: 10px;
+	display: block;
+}
+.menu li.active, .menu li a:hover{
+	background-color: #007bff;
+	color: #fff;
+}
+.menu li.active a {
+	color: #fff;	
 }

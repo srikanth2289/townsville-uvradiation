@@ -1,0 +1,6 @@
+https://www.kaggle.com/chagineth/ict-2-new2
+
+Out [31] , [32], [155] - 1st page - UV Index Summary
+Out [19], [20], [21], [22] - 2nd page - UV index jan - april
+Out [23 - 26] - 3rd page - may-aug
+Out [27 - 30]- 4th page - sep to dec
